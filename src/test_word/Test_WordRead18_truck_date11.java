@@ -171,7 +171,7 @@ public class Test_WordRead18_truck_date11 {
           
           
           
-                fasdkfjsaklfja;lfkjsal;
+                
           String directory = "C:\\All_file_New\\testfolder\\";
           
           File folder = new File(directory);
