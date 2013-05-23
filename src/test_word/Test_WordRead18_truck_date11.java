@@ -193,7 +193,7 @@ public class Test_WordRead18_truck_date11 {
             
             String line = sc.nextLine();
             System.out.println(line);
-            //line = line.replace('"', ' ');
+            line = line.replace('\"', '\0');
             Scanner scline = new Scanner(line);
             scline.useDelimiter(" *\\| *");
             count++;
@@ -268,6 +268,9 @@ public class Test_WordRead18_truck_date11 {
                        System.out.println("value is >>>>>>>>>>>>>>>>>>>>>>>>>>>>"+value);
                    }
                     
+                }
+                if(main_column_index== 70){
+                    break;
                 }
 //                System.out.println("column index value is "+columIndex);
 
