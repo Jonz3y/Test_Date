@@ -1,0 +1,5 @@
+FileSample
+FileSample$1
+DiamondIcon
+LabelAccessory
+JavaFileView

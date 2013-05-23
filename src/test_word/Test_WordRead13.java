@@ -1,0 +1,521 @@
+        /*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package test_word;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Properties;
+import java.util.Scanner;
+import java.util.StringTokenizer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+
+/**
+ *
+ * @author ppatel
+ */
+
+public class Test_WordRead13 {
+    
+    ArrayList<String> list = new ArrayList<String>();
+    String element= null;
+  public static void main(String[] args) throws SQLException {
+      
+      Test_WordRead13 FirstConvert = new Test_WordRead13();
+      FirstConvert.CovertFromText();
+      
+      
+  }
+      private int count_batch;
+    private Date date;
+    private Timestamp timeStampDate1;
+      public void CovertFromText() throws SQLException
+      {
+      
+      
+      Scanner sc = null;
+      
+             
+      
+      try{
+            //String fields = "SESSION_DATE,ROUTE_ID,ROUTE_DESCRIPTION,ROUTE_START_DATE,ROUTE_START_TIME,DEPOT_ID,DEPOT_TYPE,STOP_NUMBER,STOP_LOCATION,LOCATION_DESCRIPTION,ADDRESS_LINE1,ADDRESS_LINE2,CITY,PHONE_NUMBER,ZIP_CODE,STATE,LATITUDE,LONGITUDE,OPEN_CLOSE_TIME,TIME_WINDOWS,TRAVEL_TIME,DISTANCE,ARRIVAL_DATE,ARRIVAL_TIME,SERVICE_TIME,TOTAL _OF _SIZE1,TOTAL_ OF_ SIZE2,TOTAL_ OF_ SIZE3,DRIVER1_ID,PREVIOUS_LOCATION,DRIVER1_FIRST_NAME,DRIVER1_MIDDLE_NAME,DRIVER1_LAST_NAME,DRIVER2_ID,DRIVER2_FIRST_NAME,DRIVER2_MIDDLE_NAME,DRIVER2_LAST_NAME,ROUTE_EQUIPMENT_ID,ROUTE_EQUIPMENT_TYPE,ROUTE_EQUIPMENT_OWNER,TRIP_NUMBER,FIXED_SERVIC_ TIME,VARIABLE_SERVICE_TIME,PRE-ROUTE_TIME,STOP_TYPE,POST-ROUTE_TIME,ROUTE_DEPARTURE_TIME,ROUTE_ARRIVAL_TIME,ROUTE_COMPLETE_TIME,INTERNAL_ID";
+            Connection conn = null;
+            String sql = null;
+            PreparedStatement stmt = null;
+            
+            System.out.println("Enter in Try block");
+            Properties props = new Properties();
+            String path = System.getProperty("user.dir")+"/test.properties";
+            System.out.println("path is "+path);
+            props.load(new FileInputStream(path));  
+            
+ 
+            String DRIVER = "com.ibm.as400.access.AS400JDBCDriver";       
+            String URL = "jdbc:as400://72.14.164.60/;naming=system;libraries=OS61LXDTA:OS61LXCUST:LXLIB;transaction\n" +
+                         "isolation=none";
+            
+            
+ 
+            //Connect to iSeries                                        
+            Class.forName(DRIVER);
+            
+            
+            System.out.println("user id is "+props.getProperty("userId").trim());
+            System.out.println("password  is "+props.getProperty("password").trim());
+            System.out.println("filename   is "+props.getProperty("fileName1").trim());
+            
+            
+            
+            conn = DriverManager.getConnection(URL,props.getProperty("userId").trim(),props.getProperty("password").trim());  
+ 
+           // sql = "SELECT " + props.getProperty("fields1").trim() + " from " + props.getProperty("fileName1").trim();
+            sql = "SELECT * from " + props.getProperty("fileName1").trim();
+            System.out.println("sql statement is "+sql);
+            stmt = conn.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
+ 
+            ResultSetMetaData metaData = rs.getMetaData();
+            int colCount = metaData.getColumnCount();
+            System.out.println("column count is "+colCount);
+ 
+            String q = "";
+            for (int c = 0; c < colCount; c++) {
+                if(q.equalsIgnoreCase("")){
+                    q = "?";
+                }
+                else{
+                    q = q + ",?";
+                }
+            }
+            System.out.println("value of q is "+q);
+            sql = "INSERT into " +
+            props.getProperty("fileName1").trim() +
+            " (" + props.getProperty("fields1").trim() + ") VALUES(" + q + ")";
+          //  sql = "INSERT into FDELIVERY_MAIN (SESSION_DATE ,ROUTE_ID,ROUTE_DESCRIPTION,ROUTE_START_DATE ,ROUTE_START_TIME,DEPOT_ID ,DEPOT_TYPE,STOP_NUMBER ,STOP_LOCATION,ADDRESS_LINE1 ,ADDRESS_LINE2 ,LOCATION_DESCRIPTION ,CITY ,PHONE_NUMBER,  ZIP_CODE ,STATE ,LATITUDE,LONGITUDE ,OPEN_CLOSE_TIME,TIME_WINDOWS ,TRAVEL_TIME ,DISTANCE ,ARRIVAL_DATE,ARRIVAL_TIME,SERVICE_TIME,TOTAL_OF_SIZE1 ,TOTAL_OF_SIZE2,TOTAL_OF_SIZE3,DRIVER1_ID ,PREVIOUS_LOCATION,DRIVER1_FIRST_NAME,DRIVER1_MIDDLE_NAME,DRIVER1_LAST_NAME,DRIVER2_ID,DRIVER2_FIRST_NAME,DRIVER2_MIDDLE_NAME,DRIVER2_LAST_NAME,ROUTE_EQUIPMENT_ID,ROUTE_EQUIPMENT_TYPE,ROUTE_EQUIPMENT_OWNER ,TRIP_NUMBER,FIXED_SERVICE_TIME,VARIABLE_SERVICE_TIME,PRE_ROUTE_TIME,STOP_TYPE ,POST_ROUTE_TIME,ROUTE_DEPARTURE_TIME,ROUTE_ARRIVAL_TIME ,ROUTE_COMPLETE_TIME,INTERNAL_ID) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+            System.out.println(sql);
+            stmt = conn.prepareStatement(sql);
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          sc = new Scanner(new BufferedReader(new FileReader("C:\\A_Work\\roadnet.txt")));
+          int count = 0 ;
+          while(sc.hasNextLine()){
+            list.clear();
+            int columIndex = 0;
+            int main_column_index = 0;
+                
+            
+            String line = sc.nextLine();
+            Scanner scline = new Scanner(line);
+            scline.useDelimiter(" *\\| *");
+            count++;
+            
+            
+            while(scline.hasNext())
+            {   
+               
+                boolean enter = true; 
+                main_column_index++;
+                
+                if(main_column_index==9 || main_column_index==10 || main_column_index==11 || main_column_index==12 || main_column_index==13 || main_column_index==14 ||  main_column_index==16 || main_column_index==17){
+                    System.out.println("value of column count is "+main_column_index);
+                    scline.next();
+                    //enter = false;
+               }
+                
+               else {
+                System.out.println("column count is >>>>>>>>>>>>>>>>"+main_column_index);
+                 
+
+                 System.out.println("Enter value is  "+enter);
+                
+//                if(enter==true){
+                System.out.println("enter in loop");
+                boolean check_Value = true;
+                String value = null;
+                value = scline.next();
+                System.out.print(value+",");
+                columIndex+=1;
+               
+                
+                if(value.trim() == null || value.trim().equals("")){
+                    
+                        check_Value= false;
+                }
+
+                
+                
+                System.out.println("column index value is "+columIndex);
+                 
+                
+                switch (metaData.getColumnType(columIndex)) {
+ 
+                    case 1: // Char Datatype
+
+                            element = null;
+                            stmt.setString(columIndex,value.trim());
+                            element = "'"+value.trim()+"'";
+                            list.add(element);
+                            System.out.println("char value set");
+                            System.out.println("CHAR prepare statement"+columIndex+","+value.trim());
+                         
+                         break;
+ 
+                    case 4: // integer datatype
+                                element = null;
+                                if(check_Value==false)
+                                    value = String.valueOf(0);
+                                    
+                                
+                            
+                                double temp1 = Double.parseDouble(value.trim());
+                                stmt.setInt(columIndex,((int)temp1));
+                                if(main_column_index==1){
+                                element = "'"+(String.valueOf((int)temp1/100))+"'";
+                                list.add(element);
+                                }
+                                else{
+                                    element = "'"+(String.valueOf((int)temp1))+"'";
+                                list.add(element);
+                                }
+                                
+                                System.out.println("integer value set");
+                                System.out.println("INT prepare statement"+columIndex+","+value.trim());
+                       
+                        break;
+                   
+                        
+                    case 3:// Decimal dataype
+                                element = null;
+                                if(check_Value==false)
+                                    value = String.valueOf(0.0);
+                               
+                                BigDecimal d = new BigDecimal(value);
+                               stmt.setBigDecimal(columIndex, d);
+                               element = "'"+d+"'";
+                               list.add(String.valueOf(d));
+                               
+                               System.out.println("flot value set");
+                               System.out.println("DECIMAL prepare statement"+columIndex+","+d);
+                               
+                        break;
+                    
+                        
+                      
+                    case 91: // Date dataype
+                             
+                                element = null;
+                                DateFormat fromUser = new SimpleDateFormat("MM-dd-yyyy");
+                                DateFormat myFormat = new SimpleDateFormat("yyyy-MM-dd");
+                                String reformattedStr = null;
+                                
+                         
+                        
+                                if(main_column_index==15){
+                                    String temp =  value.substring(0, 2)+"-"+value.substring(2, 4)+"-"+value.substring(4, 8);
+                                    
+                                    reformattedStr =  myFormat.format((Date)fromUser.parse(temp.trim()));
+                                    element = "'"+reformattedStr+"'";
+                                    list.add(element);
+
+                                }
+                                else{
+                                    reformattedStr =  myFormat.format((Date)myFormat.parse(value.trim()));
+                                    element = "'"+reformattedStr+"'";
+                                    list.add(element);
+                            }
+                        
+                       
+                                try {
+                                    Date final_Date = myFormat.parse(reformattedStr);
+                                    System.out.println("date datatype value ^^^"+final_Date);
+                                    java.sql.Date sqlDate = new java.sql.Date(final_Date.getTime());
+                                    System.out.println("SQL  date datatype value ^^^ "+sqlDate);
+                                    stmt.setDate(columIndex, sqlDate);
+                                    System.out.println("Date value set");
+                                    System.out.println("DATE prepare statement DATEEEEEEEEEEEEEEEEEEEEE<<<<<<<<<<"+columIndex+","+sqlDate);
+                                     
+                                } catch (ParseException e) {
+                                    System.out.println("DATE EXCEPTION*********************************");
+                                    e.printStackTrace();
+                                }
+                             
+                        break;
+                        
+                    case 92:  // Time Data type
+
+                        String srt_time = null;
+                        
+                        if(main_column_index==37 || main_column_index==39)
+                        {
+                           
+                            if(value.trim().length()<=5)
+                            {
+                                 stmt.setTimestamp(columIndex, (Timestamp) convertdate("00:00"));
+                                 columIndex++;
+                                 stmt.setTimestamp(columIndex, (Timestamp) convertdate(value.trim()));
+                            }
+                            
+                            else{
+                            
+                            System.out.println("###################"+value.trim().substring(0, 5));
+                             System.out.println("###################"+value.trim().substring(0, 10));
+                            
+                            stmt.setTimestamp(columIndex, (Timestamp) convertdate(value.trim().substring(0, 5)));
+                            columIndex++;
+                            stmt.setTimestamp(columIndex, (Timestamp) convertdate(value.trim().substring(5, 10)));
+                            }
+                        }
+                        else
+                            stmt.setTimestamp(columIndex, (Timestamp) convertdate(value.trim()));
+                        
+                        
+                         break;    
+                        
+                    case 12:  // Varchar Date type
+                            
+                             if(columIndex!=6){
+                             element = null;
+                             stmt.setString(columIndex,value.trim());
+                             element = "'"+value.trim()+"'";
+                             list.add(element);
+                             System.out.println("varchar");
+                             }
+                          
+                             else{
+                                 element = null;
+                                 System.out.println("VARCHAR prepare statement<<<<<<<<<<<"+columIndex+","+value.trim().substring(0, 2));
+                                 stmt.setString(columIndex,value.trim().substring(0, 2));
+                                    element = "'"+value.trim().substring(0, 2)+"'";
+                                    list.add(element);
+                                 
+                                 columIndex++;
+                                 
+                                 
+                                 element = null;
+                                 System.out.println("VARCHAR prepare statement<<<<<<<<<<<"+columIndex+","+value.trim().substring(2, 4));
+                                 stmt.setString(columIndex,value.trim().substring(2, 4));
+                                     element = "'"+value.trim().substring(2, 4)+"'";
+                                     list.add(element);
+                                 
+                                 columIndex++;
+                                 
+                                 
+                                 element = null;
+                                 System.out.println("VARCHAR prepare statement<<<<<<<<<<<"+columIndex+","+value.trim().substring(4, 12));
+                                 stmt.setString(columIndex,value.trim().substring(4, 12));
+                                     element = "'"+value.trim().substring(4, 12)+"'";
+                                     list.add(element);
+                             }
+                           
+                             if (main_column_index==69){
+                                                                  
+                                 System.out.println("#####################$$$$$$$$$$$$$$$$%%%%%%%%%%%%%%%%%%%%%%%%########################################################");
+                                 
+                               columIndex++;
+                               DateFormat toformat = new SimpleDateFormat("MM/dd/yy");
+                                DateFormat myFormat1 = new SimpleDateFormat("yyyy-MM-dd");
+                                String duedate  = getduedate();
+                                System.out.println("Final Arrival Date is######################### "+duedate);
+                                reformattedStr =  myFormat1.format((Date)toformat.parse(duedate.trim()));
+                                element = "'"+reformattedStr+"'";
+                                list.add(reformattedStr);
+                                 try {
+                                    Date final_Date = myFormat1.parse(reformattedStr);
+                                    System.out.println("date datatype value ^^^"+final_Date);
+                                    java.sql.Date sqlDate = new java.sql.Date(final_Date.getTime());
+                                    System.out.println("SQL  date datatype value ^^^ "+sqlDate);
+                                    stmt.setDate(columIndex, sqlDate);
+                                    System.out.println("Date value set");
+                                    System.out.println("DATE prepare statement DATEEEEEEEEEEEEEEEEEEEEE<<<<<<<<<<"+columIndex+","+sqlDate);
+                                     
+                                } catch (SQLException e) {
+                                    System.out.println("DATE EXCEPTION*********************************");
+                                    e.printStackTrace();
+                                }
+                             }
+                               
+                             System.out.println("Varchar value set");
+                             System.out.println("VARCHAR prepare statement<<<<<<<<<<<"+columIndex+","+value.trim());
+                        
+                        
+                            break;
+                    
+                    
+                   
+                    default:
+                 
+                    }
+
+            
+            }
+                      
+            }              
+          
+                        stmt.executeUpdate();
+                        System.out.println("DONEEEEEEEEEEEE !!!!!!!!!!!!!!!!!!!!!!!!!! >> !!!!!");
+
+                    System.out.println("ROW**************************************************************"+count);
+          }
+          
+      
+      if(stmt!=null)
+          stmt.close();
+      if(rs!=null)
+          rs.close();
+      
+      } 
+      
+      
+      
+      catch (FileNotFoundException e) {
+            e.printStackTrace();
+                 e.getMessage();
+        } catch (IOException e) {
+            e.printStackTrace();
+                 e.getMessage();
+        } catch (SQLException e) {
+            e.printStackTrace();
+                 e.getMessage();
+        }
+      catch (Exception e) {
+            e.printStackTrace();
+                 e.getMessage();
+        }
+     finally{
+          if(sc!=null)
+              sc.close();
+         
+      }
+  }
+      /**
+     *
+     * @param value
+     * @return
+     * @throws ParseException
+     * @throws SQLException
+     */
+    public Timestamp convertdate(String value) throws ParseException,SQLException
+      {    
+          element = null;
+          DateFormat formatter = new SimpleDateFormat("HH:mm");
+                             String str_time = null;
+                             str_time=value.trim();
+                             System.out.println("before formatting Date"+str_time);
+                             
+                             element = "'"+str_time+":00"+"'";
+                             list.add(element);
+                             
+                             date = formatter.parse(str_time.trim()); 
+                             timeStampDate1 = new Timestamp(date.getTime());
+                             System.out.println("Time stamp object is "+timeStampDate1);
+
+                             
+          return timeStampDate1;
+      
+      }
+
+    private String getduedate() {
+            ResultSet rs = null;
+          String value = null;
+        try {
+            DateFormat myFormat1 = new SimpleDateFormat("yyyy-MM-dd");
+                             
+
+            System.out.println("Driver load succussfully for getduedate method");
+            
+            Connection conn2 = DriverManager.getConnection("jdbc:as400://72.14.164.60/;"
+                                                             + "naming=system;libraries=OS61LXDTA:OS61LXCUST:LXLIB;transaction\n" +
+                                                              "isolation=none","ppatel","papranav");
+            Statement statement = conn2.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
+                  ResultSet.CONCUR_UPDATABLE);
+            
+       System.out.println("date "+list.get(10));
+       System.out.println("store no "+list.get(0));
+       System.out.println("open time "+list.get(33));
+       System.out.println("close "+list.get(34));
+       System.out.println("dccccc "+list.get(5));
+       System.out.println("lw "+list.get(6));
+       for(int i = 0; i<list.size();i++)
+       {
+           System.out.println("Indix: "+i+" value: "+list.get(i));
+       }
+
+       
+        rs = statement.executeQuery("select \n" +
+                                        "date("+list.get(10)+") + (case when sched.del_week_name = 'WEEK1'\n" +
+                                        "then (int(deldweek.weekdayno)   - int(truckdweek.weekdayno))\n" +
+                                        "when sched.del_week_name = 'WEEK2'\n" +
+                                        "then (int(deldweek.weekdayno)   +7 - int(truckdweek.weekdayno))\n" +
+                                        "when sched.del_week_name = 'WEEK3'\n" +
+                                        "then (int(deldweek.weekdayno)   +14 - int(truckdweek.weekdayno)) end) days as final_arrive_date\n" +
+                                        "from fstore_schedule1 as sched\n" +
+                                        ", commodity_def as commo\n" +
+                                        ", week_day as truckdweek, week_day as deldweek\n" +
+
+                                        "where sched.store_no = "+list.get(0)+"\n" +
+                                        "and substr(upper(dayname("+list.get(10)+")),1,3) = sched.truck_day\n" +
+                                        "and  sched.del_time_from = "+list.get(33)+"\n" +
+                                        "and  sched.del_time_to = "+list.get(34)+"\n" +
+                                        "and commo.dc =  "+list.get(5)+"\n" +
+                                        "and commo.lw = "+list.get(6)+"\n" +
+                                        "and commo.commodity = sched.commodity\n" +
+                                        "\n" +
+                                        "and sched.truck_day =  truckdweek.weekday\n" +
+                                        "\n" +
+                                        "and sched.del_day = deldweek.weekday");
+      
+         
+          if(!rs.equals("") || rs!=null)
+          {
+              System.out.println("inside record ");
+              while(rs.next())
+              {
+                  System.out.println("inside record in while loops ");
+                  value = rs.getString("final_arrive_date");
+              }
+                  
+          }
+
+          
+        }              
+         catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        
+          return value.trim();   
+      }
+      
+}
+
+    
+
