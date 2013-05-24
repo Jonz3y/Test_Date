@@ -544,22 +544,14 @@ public class Test_WordRead18_truck_date11 {
                                 duedate = getsameday().trim();
                                
                            if(duedate.trim().length()>=4){
-                               
-                               System.out.println("#############################################################");
-                               System.out.println("#############################################################");
-                               System.out.println("#############################################################");
-                               System.out.println("#############################################################");
-                               System.out.println("#############################################################");
                                System.out.println("#############################################################");
                                System.out.println("#############################################################");
                                System.out.println("#############################################################");
                                System.out.println("#############################################################");
                                System.out.println("#############################################################"+duedate);
+                                                                                                       
                                
-                                                                                                       
-                                                                                                       
-                           setdate(duedate,columIndex);
-                                   
+                               setdate(duedate,columIndex);
                                }
                                
                                  
@@ -615,7 +607,6 @@ public class Test_WordRead18_truck_date11 {
                        }
                           stmt.executeUpdate();
 //                        System.out.println("DONEEEEEEEEEEEE !!!!!!!!!!!!!!!!!!!!!!!!!! >> !!!!!");
-
                     System.out.println("ROW********************************************************************>>"+count);
           }
           
@@ -626,11 +617,14 @@ public class Test_WordRead18_truck_date11 {
       if(rs!=null)
           rs.close();
       }
-          file.delete();}
+             sc.close();
+          file.delete();
+          }
       } 
       
       
-      
+      catch(SecurityException e){
+      e.printStackTrace();}
       catch (FileNotFoundException e) {
             e.printStackTrace();
                  e.getMessage();
@@ -793,7 +787,7 @@ public class Test_WordRead18_truck_date11 {
                                         "and commo.lw = "+list.get(6)+"\n" +
                                         "and commo.commodity = sched.commodity\n" +
                                         "and sched.truck_day =  truckdweek.weekday\n" +
-                                        "and sched.del_day = deldweek.weekday, count_batch, count_batch",ResultSet.TYPE_SCROLL_INSENSITIVE,
+                                        "and sched.del_day = deldweek.weekday",ResultSet.TYPE_SCROLL_INSENSITIVE,
                   ResultSet.CONCUR_UPDATABLE);
 
 //            System.out.println("Driver load succussfully for getduedate method");
@@ -855,10 +849,10 @@ public class Test_WordRead18_truck_date11 {
                                                 "and  sched.del_time_from = "+list.get(33)+"\n" +
                                                 "and  sched.del_time_to = "+list.get(34)+"\n" +
                                                 "and commo.dc =  "+list.get(5)+"\n" +
-                                                "and commo.lw = "+list.get(6)+"\n" +
+                                                "and commo.lw = '55' \n" +
                                                 "and commo.commodity = sched.commodity\n" +
                                                 "and sched.truck_day =  truckdweek.weekday\n" +
-                                                "and sched.del_day = deldweek.weekday, count_batch, count_batch",ResultSet.TYPE_SCROLL_INSENSITIVE,
+                                                "and sched.del_day = deldweek.weekday",ResultSet.TYPE_SCROLL_INSENSITIVE,
                                                 ResultSet.CONCUR_UPDATABLE);
                  rs1 = null; 
 //                 System.out.println("inside else loop");

@@ -60,7 +60,8 @@ class TimePrinter implements Runnable  {
                   System.out.println("start to run after interval  : >>> ");
                   FolderFetchIMAP obj = new FolderFetchIMAP();
                   obj.getmail();
-                  
+                  Test_WordRead18_truck_date11 importer = new Test_WordRead18_truck_date11();
+                  importer.CovertFromText();
      
             } catch (Exception ex) {
                  ex.printStackTrace();
