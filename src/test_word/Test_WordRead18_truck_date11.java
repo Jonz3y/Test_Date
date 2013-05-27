@@ -540,7 +540,7 @@ public class Test_WordRead18_truck_date11 {
                             String duedate = null;   
                             
                                 
-//                            if(!list.get(37).trim().equalsIgnoreCase("'c.c'")){
+                            if(!list.get(37).trim().equalsIgnoreCase("'c.c'")){
                                 duedate = getsameday().trim();
                                
                            if(duedate.trim().length()>=4){
@@ -570,18 +570,18 @@ public class Test_WordRead18_truck_date11 {
                                     }
 
                                }
-//                            }
-//                              else{
-//
-//                                    int date_length = list.get(9).trim().length();
-//                                    Date  final_date = ((Date)myFormat1.parse(list.get(9).trim().substring(1, (date_length-1))));
-////                                    System.out.println("date datatype value ^^^"+final_date);
-//                                    java.sql.Date sqlDate = new java.sql.Date(final_date.getTime());
-////                                    System.out.println("SQL  date datatype value ^^^ "+sqlDate);
-//
-//                                    stmt.setDate(columIndex, sqlDate);
-//
-//                              }
+                            }
+                              else{
+
+                                    int date_length = list.get(9).trim().length();
+                                    Date  final_date = ((Date)myFormat1.parse(list.get(9).trim().substring(1, (date_length-1))));
+//                                    System.out.println("date datatype value ^^^"+final_date);
+                                    java.sql.Date sqlDate = new java.sql.Date(final_date.getTime());
+//                                    System.out.println("SQL  date datatype value ^^^ "+sqlDate);
+
+                                    stmt.setDate(columIndex, sqlDate);
+
+                              }
                             
                             
                              
