@@ -37,9 +37,9 @@ import java.util.logging.Logger;
  * @author ppatel
  */
 
-public class Test_WordRead18_truck_date11 {
+public class Test_WordRead18_truck_date111 {
 
-    public Test_WordRead18_truck_date11() throws IOException {
+    public Test_WordRead18_truck_date111() throws IOException {
             Properties props = new Properties();
             String path = System.getProperty("user.dir")+"/test.properties";
             System.out.println("path is "+path);
@@ -81,7 +81,7 @@ public class Test_WordRead18_truck_date11 {
     ResultSet rs = null;
   public static void main(String[] args) throws SQLException, IOException {
       
-      Test_WordRead18_truck_date11 FirstConvert = new Test_WordRead18_truck_date11();
+      Test_WordRead18_truck_date111 FirstConvert = new Test_WordRead18_truck_date111();
 
       FirstConvert.CovertFromText();
       
@@ -662,10 +662,11 @@ for(File file : listOfFiles){
                  e.getMessage();
         }
      finally{
-          sc.close();
+          
           rs.close();
-          conn.close();
           stmt.close();
+          conn.close();
+          
          
       }
   }
@@ -713,7 +714,7 @@ for(File file : listOfFiles){
                                         e.printStackTrace();
                                     }
                                      finally{
-                                         stmt.close();
+//                                         stmt.close();
                                      }
     
     
@@ -726,8 +727,11 @@ for(File file : listOfFiles){
     ResultSet rs = null;
     Connection conn = null;
     PreparedStatement stmt = null;    
-        
-     conn = databaseconnection(userid, password);
+     String date = null;    
+    
+    
+   try{
+    conn = databaseconnection(userid, password);
 
         
             System.out.println("date "+list.get(9));
@@ -758,7 +762,7 @@ for(File file : listOfFiles){
 
     
       rs = stmt.executeQuery();
-      String date = null;
+     
                                                 
                                                 
         if(rs.next()){
@@ -768,12 +772,24 @@ for(File file : listOfFiles){
         }
         else
             date = "no";
+    }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+        finally{
+       
+        rs.close();
+        stmt.close();
         conn.close();
-        return date;
+        
+        
+        
+        }
+         return date;
     }
     
  
-    private String getduedate() {
+    private String getduedate() throws SQLException {
             ResultSet rs = null;
             ResultSet rs1 = null;
             Connection conn = null;
@@ -827,12 +843,12 @@ for(File file : listOfFiles){
 //                  ResultSet.CONCUR_UPDATABLE);
             
             
-       System.out.println("date "+list.get(9));
-       System.out.println("store no "+list.get(0));
-       System.out.println("open time "+list.get(33));
-       System.out.println("close "+list.get(34));
-       System.out.println("dccccc "+list.get(5));
-       System.out.println("lw "+list.get(6));
+       System.out.println("date 9>>>>"+list.get(9));
+       System.out.println("store no 0>>>>"+list.get(0));
+       System.out.println("open time 33>>>>"+list.get(33));
+       System.out.println("close 34>>>>"+list.get(34));
+       System.out.println("dccccc 5>>>>"+list.get(5));
+       System.out.println("lw 6"+list.get(6));
        for(int i = 0; i<list.size();i++)
        {
            System.out.println("Indix: "+i+" value: "+list.get(i));
@@ -946,6 +962,12 @@ for(File file : listOfFiles){
                  
          catch (Exception ex) {
             ex.printStackTrace();
+        }
+        finally{
+            rs.close();
+            rs1.close();
+            stmt.close();
+            conn.close();
         }
         
             if(!value.trim().equalsIgnoreCase("") || value.trim()!=null)

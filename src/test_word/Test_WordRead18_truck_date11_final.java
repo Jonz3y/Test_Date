@@ -37,9 +37,9 @@ import java.util.logging.Logger;
  * @author ppatel
  */
 
-public class Test_WordRead18_truck_date11 {
+public class Test_WordRead18_truck_date11_final {
 
-    public Test_WordRead18_truck_date11() throws IOException {
+    public Test_WordRead18_truck_date11_final() throws IOException {
             Properties props = new Properties();
             String path = System.getProperty("user.dir")+"/test.properties";
             System.out.println("path is "+path);
@@ -81,7 +81,7 @@ public class Test_WordRead18_truck_date11 {
     ResultSet rs = null;
   public static void main(String[] args) throws SQLException, IOException {
       
-      Test_WordRead18_truck_date11 FirstConvert = new Test_WordRead18_truck_date11();
+      Test_WordRead18_truck_date11_final FirstConvert = new Test_WordRead18_truck_date11_final();
 
       FirstConvert.CovertFromText();
       
@@ -547,7 +547,7 @@ for(File file : listOfFiles){
                             String duedate = null;   
                             
                                 
-                            if(!list.get(37).trim().equalsIgnoreCase("'c.c'")){
+                            if(!list.get(37).trim().equalsIgnoreCase("c.c") && !list.get(5).trim().equalsIgnoreCase("30")){
                                 duedate = getsameday().trim();
                                
                            if(duedate.trim().length()>=4){
@@ -617,13 +617,16 @@ for(File file : listOfFiles){
                     System.out.println("ROW********************************************************************>>"+count);
           }
           
-//      if(sc!=null)
-//          sc.close();
-//      if(stmt!=null)
-//         stmt.close();
-//      if(rs!=null)
-//          rs.close();
-
+      if(sc!=null)
+          sc.close();
+      if(stmt!=null)
+         stmt.close();
+      if(rs!=null)
+          rs.close();
+      
+     
+     
+     
         }
       }
         
@@ -637,10 +640,10 @@ for(File file : listOfFiles){
        finally{
           //if(sc!=null)
               sc.close();
-       }
+      }
  
          
-        file.delete();
+            file.delete();
           
       
         }
@@ -662,7 +665,7 @@ for(File file : listOfFiles){
                  e.getMessage();
         }
      finally{
-          sc.close();
+          
           rs.close();
           conn.close();
           stmt.close();
@@ -690,7 +693,7 @@ for(File file : listOfFiles){
       
       }
     
-    private void setdate(String duedate, int columIndex) throws ParseException, SQLException {
+    private void setdate(String duedate, int columIndex) throws ParseException {
        
         String  reformattedStr=null;
         reformattedStr = myFormat1.format((Date)toformat.parse(duedate.trim()));
@@ -712,9 +715,6 @@ for(File file : listOfFiles){
                                         System.out.println("DATE EXCEPTION*********************************");
                                         e.printStackTrace();
                                     }
-                                     finally{
-                                         stmt.close();
-                                     }
     
     
     

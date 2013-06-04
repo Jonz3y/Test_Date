@@ -37,9 +37,9 @@ import java.util.logging.Logger;
  * @author ppatel
  */
 
-public class Test_WordRead18_truck_date11 {
+public class Test_WordRead18_truck_date11_30_5 {
 
-    public Test_WordRead18_truck_date11() throws IOException {
+    public Test_WordRead18_truck_date11_30_5() throws IOException {
             Properties props = new Properties();
             String path = System.getProperty("user.dir")+"/test.properties";
             System.out.println("path is "+path);
@@ -81,7 +81,7 @@ public class Test_WordRead18_truck_date11 {
     ResultSet rs = null;
   public static void main(String[] args) throws SQLException, IOException {
       
-      Test_WordRead18_truck_date11 FirstConvert = new Test_WordRead18_truck_date11();
+      Test_WordRead18_truck_date11_30_5 FirstConvert = new Test_WordRead18_truck_date11_30_5();
 
       FirstConvert.CovertFromText();
       
@@ -563,10 +563,13 @@ for(File file : listOfFiles){
                                
                                  
                            else{      
-                                     duedate  = getduedate();   // do calculation of due_date 
+                                     
+                               
+                               duedate  = getduedate();   // do calculation of due_date 
 
                                   if(duedate.trim().length()>2){
 //                                    System.out.println("Final Arrival Date is######################### "+duedate);
+                                    System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@DATE@@@@@@@@@@@@@@@@@@"+duedate);
                                     setdate(duedate,columIndex);
                                     
                                     }
@@ -612,7 +615,10 @@ for(File file : listOfFiles){
                            
                            System.out.println("Indix: "+i+" value: "+list.get(i));
                        }
-                          stmt.executeUpdate();
+                          
+                       
+                       
+                       stmt.executeUpdate();
 //                        System.out.println("DONEEEEEEEEEEEE !!!!!!!!!!!!!!!!!!!!!!!!!! >> !!!!!");
                     System.out.println("ROW********************************************************************>>"+count);
           }
@@ -640,7 +646,7 @@ for(File file : listOfFiles){
        }
  
          
-        file.delete();
+       // file.delete();
           
       
         }
@@ -662,10 +668,11 @@ for(File file : listOfFiles){
                  e.getMessage();
         }
      finally{
-          sc.close();
+        
           rs.close();
-          conn.close();
           stmt.close();
+          conn.close();
+        
          
       }
   }
@@ -726,8 +733,11 @@ for(File file : listOfFiles){
     ResultSet rs = null;
     Connection conn = null;
     PreparedStatement stmt = null;    
-        
-     conn = databaseconnection(userid, password);
+     String date = null;    
+    
+    
+   try{
+    conn = databaseconnection(userid, password);
 
         
             System.out.println("date "+list.get(9));
@@ -758,7 +768,7 @@ for(File file : listOfFiles){
 
     
       rs = stmt.executeQuery();
-      String date = null;
+     
                                                 
                                                 
         if(rs.next()){
@@ -768,24 +778,40 @@ for(File file : listOfFiles){
         }
         else
             date = "no";
+    }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+        finally{
+        rs.close();
+        stmt.close();
         conn.close();
-        return date;
+        
+        
+        
+        }
+         return date;
     }
     
  
-    private String getduedate() {
+    private String getduedate() throws SQLException {
             ResultSet rs = null;
             ResultSet rs1 = null;
             Connection conn = null;
             PreparedStatement stmt = null;   
             String value = null;
             String value1 = null;
-        try {
+     
             DateFormat myFormat1 = new SimpleDateFormat("yyyy-MM-dd");
+            
+            
+            try{
             
             
             conn = databaseconnection(userid, password);
            
+        
+            
             stmt = conn.prepareStatement("select \n" +
                                         "date("+list.get(9)+") + (case when truckdweek.weekdayno > deldweek.weekdayno\n" +
                                         "then \n" +
@@ -816,6 +842,36 @@ for(File file : listOfFiles){
                                         "and sched.truck_day =  truckdweek.weekday\n" +
                                         "and sched.del_day = deldweek.weekday",ResultSet.TYPE_SCROLL_INSENSITIVE,
                   ResultSet.CONCUR_UPDATABLE);
+            
+            System.out.println("select \n" +
+                                        "date("+list.get(9)+") + (case when truckdweek.weekdayno > deldweek.weekdayno\n" +
+                                        "then \n" +
+                                        "	(case when sched.del_week_name = 'WEEK1'\n" +
+                                        "	then (7 - (int(truckdweek.weekdayno)) + int(deldweek.weekdayno))\n" +
+                                        "	when sched.del_week_name = 'WEEK2'\n" +
+                                        "	then (7 - (int(truckdweek.weekdayno))+ int(deldweek.weekdayno) +7)\n" +
+                                        "	when sched.del_week_name = 'WEEK3'\n" +
+                                        "	then (7 - (int(truckdweek.weekdayno))+ int(deldweek.weekdayno)+14) end)\n" +
+                                        "\n" +
+                                        "when truckdweek.weekdayno <= deldweek.weekdayno\n" +
+                                        "	then (case when sched.del_week_name = 'WEEK1'\n" +
+                                        "	then (int(deldweek.weekdayno)   - int(truckdweek.weekdayno))\n" +
+                                        "	when sched.del_week_name = 'WEEK2'\n" +
+                                        "	then (int(deldweek.weekdayno)   +7 - int(truckdweek.weekdayno))\n" +
+                                        "	when sched.del_week_name = 'WEEK3'\n" +
+                                        "	then (int(deldweek.weekdayno)   +14 - int(truckdweek.weekdayno)) end)end) days as final_arrive_date \n" +
+                                        "\n" +
+                                        "from fstore_schedule1 as sched, commodity_def as commo, week_day as truckdweek, week_day as deldweek\n" +
+                                        "\n" +
+                                        "where sched.store_no = "+list.get(0)+"\n" +
+                                        "and substr(upper(dayname("+list.get(9)+")),1,3) = sched.truck_day\n" +
+                                        "and  sched.del_time_from = "+list.get(33)+"\n" +
+                                        "and  sched.del_time_to = "+list.get(34)+"\n" +
+                                        "and commo.dc =  "+list.get(5)+"\n" +
+                                        "and commo.lw = "+list.get(6)+"\n" +
+                                        "and commo.commodity = sched.commodity\n" +
+                                        "and sched.truck_day =  truckdweek.weekday\n" +
+                                        "and sched.del_day = deldweek.weekday");
 
 //            System.out.println("Driver load succussfully for getduedate method");
 //            
@@ -827,12 +883,12 @@ for(File file : listOfFiles){
 //                  ResultSet.CONCUR_UPDATABLE);
             
             
-       System.out.println("date "+list.get(9));
-       System.out.println("store no "+list.get(0));
-       System.out.println("open time "+list.get(33));
-       System.out.println("close "+list.get(34));
-       System.out.println("dccccc "+list.get(5));
-       System.out.println("lw "+list.get(6));
+       System.out.println("date 9>>>>"+list.get(9));
+       System.out.println("store no 0>>>>"+list.get(0));
+       System.out.println("open time 33>>>>"+list.get(33));
+       System.out.println("close 34>>>>"+list.get(34));
+       System.out.println("dccccc 5>>>>"+list.get(5));
+       System.out.println("lw 6>>>>"+list.get(6));
        for(int i = 0; i<list.size();i++)
        {
            System.out.println("Indix: "+i+" value: "+list.get(i));
@@ -846,10 +902,15 @@ for(File file : listOfFiles){
              if (rs.first()) {
                   
 //                  System.out.println("inside record in while loops ");
+                    System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+                    System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
                   value = rs.getString("final_arrive_date");
-
              }
              else{
+                 
+                 System.out.println("############################################################");
+                 System.out.println("############################################################");
+                 
                  
                   stmt = conn.prepareStatement("select \n" +
                                                 "date("+list.get(9)+") + (case when truckdweek.weekdayno > deldweek.weekdayno\n" +
@@ -873,8 +934,8 @@ for(File file : listOfFiles){
                                                 "\n" +
                                                 "where sched.store_no = "+list.get(0)+"\n" +
                                                 "and substr(upper(dayname("+list.get(9)+")),1,3) = sched.truck_day\n" +
-                                                "and  sched.del_time_from = "+list.get(33)+"\n" +
-                                                "and  sched.del_time_to = "+list.get(34)+"\n" +
+//                                                "and  sched.del_time_from = "+list.get(33)+"\n" +
+//                                                "and  sched.del_time_to = "+list.get(34)+"\n" +
                                                 "and commo.dc =  "+list.get(5)+"\n" +
                                                 "and commo.lw = '55' \n" +
                                                 "and commo.commodity = sched.commodity\n" +
@@ -886,34 +947,34 @@ for(File file : listOfFiles){
                  rs1 = stmt.executeQuery();
                  
                  
-//                 System.out.println("select \n" +
-//                                        "date("+list.get(10)+") + (case when truckdweek.weekdayno > deldweek.weekdayno\n" +
-//                                        "then \n" +
-//                                        "	(case when sched.del_week_name = 'WEEK1'\n" +
-//                                        "	then (7 - (int(truckdweek.weekdayno)) + int(deldweek.weekdayno))\n" +
-//                                        "	when sched.del_week_name = 'WEEK2'\n" +
-//                                        "	then (7 - (int(truckdweek.weekdayno))+ int(deldweek.weekdayno) +7)\n" +
-//                                        "	when sched.del_week_name = 'WEEK3'\n" +
-//                                        "	then (7 - (int(truckdweek.weekdayno))+ int(deldweek.weekdayno)+14) end)\n" +
-//                                        "\n" +
-//                                        "when truckdweek.weekdayno <= deldweek.weekdayno\n" +
-//                                        "	then (case when sched.del_week_name = 'WEEK1'\n" +
-//                                        "	then (int(deldweek.weekdayno)   - int(truckdweek.weekdayno))\n" +
-//                                        "	when sched.del_week_name = 'WEEK2'\n" +
-//                                        "	then (int(deldweek.weekdayno)   +7 - int(truckdweek.weekdayno))\n" +
-//                                        "	when sched.del_week_name = 'WEEK3'\n" +
-//                                        "	then (int(deldweek.weekdayno)   +14 - int(truckdweek.weekdayno)) end)end) days as final_arrive_date \n" +
-//                                        "\n" +
-//                                        "from fstore_schedule1 as sched, commodity_def as commo, week_day as truckdweek, week_day as deldweek\n" +
-//                                        "\n" +
-//                                        "where sched.store_no = "+list.get(0)+"\n" +
-//                                        "and substr(upper(dayname("+list.get(10)+")),1,3) = sched.truck_day\n" +
-//                                       "and commo.dc =  "+list.get(5)+"\n" +
-//                                        "and commo.lw = "+list.get(6)+"\n" +
-//                                        "and commo.commodity = sched.commodity\n" +
-//                                        "and sched.truck_day =  truckdweek.weekday\n" +
-//                                        "and sched.del_day = deldweek.weekday");
-//                                            
+                 System.out.println("select \n" +
+                                        "date("+list.get(10)+") + (case when truckdweek.weekdayno > deldweek.weekdayno\n" +
+                                        "then \n" +
+                                        "	(case when sched.del_week_name = 'WEEK1'\n" +
+                                        "	then (7 - (int(truckdweek.weekdayno)) + int(deldweek.weekdayno))\n" +
+                                        "	when sched.del_week_name = 'WEEK2'\n" +
+                                        "	then (7 - (int(truckdweek.weekdayno))+ int(deldweek.weekdayno) +7)\n" +
+                                        "	when sched.del_week_name = 'WEEK3'\n" +
+                                        "	then (7 - (int(truckdweek.weekdayno))+ int(deldweek.weekdayno)+14) end)\n" +
+                                        "\n" +
+                                        "when truckdweek.weekdayno <= deldweek.weekdayno\n" +
+                                        "	then (case when sched.del_week_name = 'WEEK1'\n" +
+                                        "	then (int(deldweek.weekdayno)   - int(truckdweek.weekdayno))\n" +
+                                        "	when sched.del_week_name = 'WEEK2'\n" +
+                                        "	then (int(deldweek.weekdayno)   +7 - int(truckdweek.weekdayno))\n" +
+                                        "	when sched.del_week_name = 'WEEK3'\n" +
+                                        "	then (int(deldweek.weekdayno)   +14 - int(truckdweek.weekdayno)) end)end) days as final_arrive_date \n" +
+                                        "\n" +
+                                        "from fstore_schedule1 as sched, commodity_def as commo, week_day as truckdweek, week_day as deldweek\n" +
+                                        "\n" +
+                                        "where sched.store_no = "+list.get(0)+"\n" +
+                                        "and substr(upper(dayname("+list.get(10)+")),1,3) = sched.truck_day\n" +
+                                       "and commo.dc =  "+list.get(5)+"\n" +
+                                        "and commo.lw = "+list.get(6)+"\n" +
+                                        "and commo.commodity = sched.commodity\n" +
+                                        "and sched.truck_day =  truckdweek.weekday\n" +
+                                        "and sched.del_day = deldweek.weekday");
+                                            
                  
                                                
                                                 
@@ -933,20 +994,35 @@ for(File file : listOfFiles){
 //                                          System.out.println("value is $$$$$$$$$$$$$$$$"+value.trim());     
       
                                             
-             }              
+                    }              
 //                                                 if (rs!=null){
 //                                                  System.out.println("inside record in second while loops ");
-                                               
-                                              
-                   
-              
                                              
-                  }
+          }
 
-                 
+          catch(SQLException e){
+              e.printStackTrace();
+          }       
          catch (Exception ex) {
             ex.printStackTrace();
         }
+        finally{
+            
+            if(rs!=null)
+            rs.close();
+            if(rs1!=null)
+            rs1.close();
+//            if(stmt!=null)
+            stmt.close();
+//            if(conn!=null)
+            conn.close();
+        }
+        
+        
+        
+            System.out.println("#####################################"+value);
+        
+        
         
             if(!value.trim().equalsIgnoreCase("") || value.trim()!=null)
                 return value.trim(); 

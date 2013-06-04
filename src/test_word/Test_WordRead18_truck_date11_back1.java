@@ -37,9 +37,9 @@ import java.util.logging.Logger;
  * @author ppatel
  */
 
-public class Test_WordRead18_truck_date11 {
+public class Test_WordRead18_truck_date11_back1 {
 
-    public Test_WordRead18_truck_date11() throws IOException {
+    public Test_WordRead18_truck_date11_back1() throws IOException {
             Properties props = new Properties();
             String path = System.getProperty("user.dir")+"/test.properties";
             System.out.println("path is "+path);
@@ -81,7 +81,7 @@ public class Test_WordRead18_truck_date11 {
     ResultSet rs = null;
   public static void main(String[] args) throws SQLException, IOException {
       
-      Test_WordRead18_truck_date11 FirstConvert = new Test_WordRead18_truck_date11();
+      Test_WordRead18_truck_date11_back1 FirstConvert = new Test_WordRead18_truck_date11_back1();
 
       FirstConvert.CovertFromText();
       
@@ -947,6 +947,7 @@ for(File file : listOfFiles){
          catch (Exception ex) {
             ex.printStackTrace();
         }
+        
         
             if(!value.trim().equalsIgnoreCase("") || value.trim()!=null)
                 return value.trim(); 

@@ -37,9 +37,9 @@ import java.util.logging.Logger;
  * @author ppatel
  */
 
-public class Test_WordRead18_truck_date11 {
+public class Test_WordRead18_truck_date11_org {
 
-    public Test_WordRead18_truck_date11() throws IOException {
+    public Test_WordRead18_truck_date11_org() throws IOException {
             Properties props = new Properties();
             String path = System.getProperty("user.dir")+"/test.properties";
             System.out.println("path is "+path);
@@ -78,10 +78,9 @@ public class Test_WordRead18_truck_date11 {
     Connection conn = null;
     String sql = null;
     PreparedStatement stmt = null;
-    ResultSet rs = null;
   public static void main(String[] args) throws SQLException, IOException {
       
-      Test_WordRead18_truck_date11 FirstConvert = new Test_WordRead18_truck_date11();
+      Test_WordRead18_truck_date11_org FirstConvert = new Test_WordRead18_truck_date11_org();
 
       FirstConvert.CovertFromText();
       
@@ -144,7 +143,7 @@ public class Test_WordRead18_truck_date11 {
 //            sql = "SELECT * from " + filename.trim();
             System.out.println("sql statement is "+sql);
             stmt = conn.prepareStatement(sql);
-            rs = stmt.executeQuery();
+            ResultSet rs = stmt.executeQuery();
  
             ResultSetMetaData metaData = rs.getMetaData();
             int colCount = metaData.getColumnCount();
@@ -176,18 +175,12 @@ public class Test_WordRead18_truck_date11 {
           String directory = "C:\\All_file_New\\testfolder\\";
           
           File folder = new File(directory);
- 
           File[] listOfFiles = folder.listFiles();
-  
-
-for(File file : listOfFiles){
-   
- try{
-    
-     if(file.isFile()){
+          
+          for(File file : listOfFiles){
+              if(file.isFile()){
               String accessPath = directory + file.getName();
               System.out.println(accessPath);
-              
               
           stmt = conn.prepareStatement(sql);
           sc = new Scanner(new BufferedReader(new FileReader(accessPath)));
@@ -276,7 +269,7 @@ for(File file : listOfFiles){
                    }
                     
                 }
-                if(main_column_index== 70){   // new file format comes with extra pipe delimeter follwing last column 
+                if(main_column_index== 70){
                     break;
                 }
 //                System.out.println("column index value is "+columIndex);
@@ -617,37 +610,22 @@ for(File file : listOfFiles){
                     System.out.println("ROW********************************************************************>>"+count);
           }
           
-//      if(sc!=null)
-//          sc.close();
-//      if(stmt!=null)
-//         stmt.close();
-//      if(rs!=null)
-//          rs.close();
-
-        }
-      }
-        
-       catch (IOException e) {
-            e.printStackTrace();
-       }catch(SQLException ex){
-          ex.printStackTrace();
-      }catch(Exception e){
-          e.printStackTrace();
-      }
-       finally{
-          //if(sc!=null)
-              sc.close();
-       }
- 
-         
-        file.delete();
-          
       
-        }
-   
-        } catch(SecurityException e){
-            e.printStackTrace();
-        } catch (FileNotFoundException e) {
+      if(stmt!=null)
+          
+          stmt.close();
+      if(rs!=null)
+          rs.close();
+      }
+             sc.close();
+          file.delete();
+          }
+      } 
+      
+      
+      catch(SecurityException e){
+      e.printStackTrace();}
+      catch (FileNotFoundException e) {
             e.printStackTrace();
                  e.getMessage();
         } catch (IOException e) {
@@ -662,10 +640,8 @@ for(File file : listOfFiles){
                  e.getMessage();
         }
      finally{
-          sc.close();
-          rs.close();
-          conn.close();
-          stmt.close();
+          if(sc!=null)
+              sc.close();
          
       }
   }
@@ -690,7 +666,7 @@ for(File file : listOfFiles){
       
       }
     
-    private void setdate(String duedate, int columIndex) throws ParseException, SQLException {
+    private void setdate(String duedate, int columIndex) throws ParseException {
        
         String  reformattedStr=null;
         reformattedStr = myFormat1.format((Date)toformat.parse(duedate.trim()));
@@ -712,9 +688,6 @@ for(File file : listOfFiles){
                                         System.out.println("DATE EXCEPTION*********************************");
                                         e.printStackTrace();
                                     }
-                                     finally{
-                                         stmt.close();
-                                     }
     
     
     

@@ -37,9 +37,9 @@ import java.util.logging.Logger;
  * @author ppatel
  */
 
-public class Test_WordRead18_truck_date11 {
+public class Test_WordRead18_truck_date11_org2 {
 
-    public Test_WordRead18_truck_date11() throws IOException {
+    public Test_WordRead18_truck_date11_org2() throws IOException {
             Properties props = new Properties();
             String path = System.getProperty("user.dir")+"/test.properties";
             System.out.println("path is "+path);
@@ -81,7 +81,7 @@ public class Test_WordRead18_truck_date11 {
     ResultSet rs = null;
   public static void main(String[] args) throws SQLException, IOException {
       
-      Test_WordRead18_truck_date11 FirstConvert = new Test_WordRead18_truck_date11();
+      Test_WordRead18_truck_date11_org2 FirstConvert = new Test_WordRead18_truck_date11_org2();
 
       FirstConvert.CovertFromText();
       
@@ -640,7 +640,7 @@ for(File file : listOfFiles){
        }
  
          
-        file.delete();
+//        file.delete();
           
       
         }
@@ -662,7 +662,7 @@ for(File file : listOfFiles){
                  e.getMessage();
         }
      finally{
-          sc.close();
+              sc.close();
           rs.close();
           conn.close();
           stmt.close();
