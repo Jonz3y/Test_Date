@@ -37,9 +37,9 @@ import java.util.logging.Logger;
  * @author ppatel
  */
 
-public class Test_WordRead18_truck_date11_final {
+public class Test_WordRead18_truck_date12_client_caching {
 
-    public Test_WordRead18_truck_date11_final() throws IOException {
+    public Test_WordRead18_truck_date12_client_caching() throws IOException {
             Properties props = new Properties();
             String path = System.getProperty("user.dir")+"/test.properties";
             System.out.println("path is "+path);
@@ -58,9 +58,17 @@ public class Test_WordRead18_truck_date11_final {
         
     }
         
-    
+    final static int COLUMN_NO = 66;
     ArrayList<String> list = new ArrayList<String>();
+    /**
+     *
+     */
+     public static  ArrayList[] cache = null;
+       
+
+     
     String element= null;
+    int basecount;
     
     public String userid = null;
     public String password = null;
@@ -81,9 +89,15 @@ public class Test_WordRead18_truck_date11_final {
     ResultSet rs = null;
   public static void main(String[] args) throws SQLException, IOException {
       
-      Test_WordRead18_truck_date11_final FirstConvert = new Test_WordRead18_truck_date11_final();
-
+      cache = new ArrayList[COLUMN_NO];
+      
+      Test_WordRead18_truck_date12_client_caching FirstConvert = new Test_WordRead18_truck_date12_client_caching();
       FirstConvert.CovertFromText();
+      
+      for(int i=0;i<COLUMN_NO;i++){
+          cache[i] = new ArrayList<String>();
+          
+      }
       
   }
   
@@ -181,29 +195,32 @@ public class Test_WordRead18_truck_date11_final {
   
 
 for(File file : listOfFiles){
+    
+   // cache = new ArrayList[COLUMN_NO];
    
  try{
     
-     if(file.isFile()){
-              String accessPath = directory + file.getName();
-              System.out.println(accessPath);
-              
-              
-          stmt = conn.prepareStatement(sql);
-          sc = new Scanner(new BufferedReader(new FileReader(accessPath)));
-          int count = 0 ;
-          while(sc.hasNextLine()){
-            list.clear();
-            int columIndex = 0;
-            int main_column_index = 0;
-                
-            
-            String line = sc.nextLine();
-            System.out.println(line);
-            line = line.replace('\"', '\0');
-            Scanner scline = new Scanner(line);
-            scline.useDelimiter(" *\\| *");
-            count++;
+        if(file.isFile()){
+            String accessPath = directory + file.getName();
+            System.out.println(accessPath);
+
+
+            stmt = conn.prepareStatement(sql);
+            sc = new Scanner(new BufferedReader(new FileReader(accessPath)));
+            int count = 0 ;
+             basecount = -1;   // array of array list >> variable to keep track of actual column index of delivery_database
+        while(sc.hasNextLine()){
+                list.clear();
+                int columIndex = 0;
+                int main_column_index = 0;
+
+
+                String line = sc.nextLine();
+                System.out.println(line);
+                line = line.replace('\"', '\0');
+                Scanner scline = new Scanner(line);
+                scline.useDelimiter(" *\\| *");
+                count++;
             
             
             while(scline.hasNext())
@@ -283,6 +300,7 @@ for(File file : listOfFiles){
 
 //                System.out.println("COLUME TYPE is "+metaData.getColumnType(columIndex));
                 switch (metaData.getColumnType(columIndex)) {
+                    
  
                     case 1: // Char Datatype
 
@@ -290,6 +308,11 @@ for(File file : listOfFiles){
                             stmt.setString(columIndex,value.trim());
                             element = "'"+value.trim()+"'";
                             list.add(element);
+                            
+                            
+                            
+                            cache[++basecount].add(value.trim());
+                            
 //                            System.out.println("char value set");
                             System.out.println("CHAR prepare statement"+columIndex+" " +dbName[columIndex]+ "," +value.trim());
                          
@@ -297,16 +320,34 @@ for(File file : listOfFiles){
  
                     case 4: // integer datatype
                                 element = null;
-                                if(check_Value==false)
+                                
+                                if(check_Value==false) // if current get VALUE is null 
                                     value = String.valueOf(0);
                                     
                                 
                             
                                 double temp1 = Double.parseDouble(value.trim());
+                                
+                                System.out.println(">>>>>>>>>>>>>>>>>>>size of basecount"+(++basecount));
+                                //cache[0].add("hello");
+                                
+                                System.out.println("^^^^^^^^^^^^^^^^^^^^^^"+temp1);
+                                
+                                cache[++basecount].add(String.valueOf((int)temp1));
+                              
+                                System.out.println("size of basecount"+(++basecount));
+                                
+                                
                                 stmt.setInt(columIndex,((int)temp1));
-                                if(main_column_index==1){
+                                
+                                
+                                
+                                // for coparing two fields of table, exclude last two zero so both table fields become same 
+                                if(main_column_index==1){ // if column is STORE_NO than exclude last two zero
+                                    
                                 element = "'"+(String.valueOf((int)temp1/100))+"'";
                                 list.add(element);
+                                
                                 }
                                 else{
                                     element = "'"+(String.valueOf((int)temp1))+"'";
@@ -336,6 +377,7 @@ for(File file : listOfFiles){
                                         System.out.println(makeD);
                                         d = new BigDecimal(makeD);
                                     }
+                               cache[++basecount].add(String.valueOf(d));
                                stmt.setBigDecimal(columIndex, d);
                                element = "'"+d+"'";
                                list.add(String.valueOf(d));
@@ -363,6 +405,7 @@ for(File file : listOfFiles){
                                     String temp =  value.substring(0, 2)+"-"+value.substring(2, 4)+"-"+value.substring(4, 8);
                                     
                                     reformattedStr =  myFormat.format((Date)fromUser.parse(temp.trim()));
+                                    cache[++basecount].add(String.valueOf(reformattedStr));
                                     element = "'"+reformattedStr+"'";
                                     list.add(element);
 
@@ -371,6 +414,8 @@ for(File file : listOfFiles){
                                     stmt.setNull(columIndex, java.sql.Types.DATE);
                                     System.out.println("DATE prepare statement"+columIndex+" " +dbName[columIndex]+ ","+value.trim());
                                     element = "'"+value.trim()+"'";
+                                    
+                                    cache[++basecount].add(String.valueOf(value.trim()));
                                     list.add(element);
                                      break;
                                 }
@@ -378,6 +423,8 @@ for(File file : listOfFiles){
                                     System.out.println(value.trim());
                                     reformattedStr =  myFormat.format((Date)myFormat.parse(value.trim()));
                                     element = "'"+reformattedStr+"'";
+                                    
+                                    cache[++basecount].add(String.valueOf(reformattedStr));
                                     list.add(element);
                             }
                         
@@ -423,6 +470,7 @@ for(File file : listOfFiles){
                                 stmt.setNull(columIndex, java.sql.Types.TIME);
 //                               columIndex++;
                                element = "''";
+                                cache[++basecount].add(String.valueOf(""));
                                 list.add(element);
                         }
                         }    
@@ -479,6 +527,7 @@ for(File file : listOfFiles){
                                     stmt.setNull(columIndex, java.sql.Types.DATE);
                                     System.out.println("TIME prepare statement"+columIndex+" " +dbName[columIndex]+ ","+value.trim());
                                     element = "'"+value.trim()+"'";
+                                        cache[++basecount].add(String.valueOf(value.trim()));
                                     list.add(element);
                                      break;
                                 }
@@ -498,6 +547,7 @@ for(File file : listOfFiles){
                              element = null;
                              stmt.setString(columIndex,value.trim());
                              element = "'"+value.trim()+"'";
+                              cache[++basecount].add(String.valueOf(value.trim()));
                              list.add(element);
 //                             System.out.println("varchar");
                              }
@@ -505,9 +555,11 @@ for(File file : listOfFiles){
                              else if(main_column_index==55){
                                  stmt.setNull(columIndex, java.sql.Types.VARCHAR);
                                  element = "''";
+                                  cache[++basecount].add(String.valueOf(""));
                                  list.add(element);
                                  columIndex++;
                                  stmt.setNull(columIndex, java.sql.Types.VARCHAR);
+                                  cache[++basecount].add(String.valueOf(""));
                                  element = "''";
                                 list.add(element);
                              }
@@ -516,25 +568,34 @@ for(File file : listOfFiles){
                                  element = null;
                                  System.out.println("VARCHAR prepare statement<<<<<<<<<<<"+columIndex+" " +dbName[columIndex]+ ","+value.trim().substring(0, 2));
                                  stmt.setString(columIndex,value.trim().substring(0, 2));
-                                    element = "'"+value.trim().substring(0, 2)+"'";
+                                    String temp = value.trim().substring(0, 2);
+                                    element = "'"+temp+"'";
+                                     cache[++basecount].add(String.valueOf(temp));
                                     list.add(element);
                                  
                                  columIndex++;
                                  
                                  
                                  element = null;
+                                 String temp2 = value.trim().substring(2, 4);
                                  System.out.println("VARCHAR prepare statement<<<<<<<<<<<"+columIndex+" " +dbName[columIndex]+ ","+value.trim().substring(2, 4));
-                                 stmt.setString(columIndex,value.trim().substring(2, 4));
-                                     element = "'"+value.trim().substring(2, 4)+"'";
+                                 
+                                 stmt.setString(columIndex,temp2);
+                                 
+                                     element = "'"+temp2+"'";
+                                     cache[++basecount].add(String.valueOf(temp2));
                                      list.add(element);
+                                 
                                  
                                  columIndex++;
                                  
                                  
                                  element = null;
+                                 String temp3 = value.trim().substring(4, 12);
                                  System.out.println("VARCHAR prepare statement<<<<<<<<<<<"+columIndex+" " +dbName[columIndex]+ ","+value.trim().substring(4, 12));
-                                 stmt.setString(columIndex,value.trim().substring(4, 12));
-                                     element = "'"+value.trim().substring(4, 12)+"'";
+                                 stmt.setString(columIndex,temp3);
+                                     element = "'"+temp3+"'";
+                                     cache[++basecount].add(String.valueOf(temp3));
                                      list.add(element);
                              }
                            
@@ -546,14 +607,8 @@ for(File file : listOfFiles){
                                
                             String duedate = null;   
                             
-                             System.out.println("list37 : " + list.get(37));
-                             System.out.println("list37 : " + !list.get(37).trim().equalsIgnoreCase("C.C"));
-                             System.out.println("list37 : " + !list.get(37).trim().equalsIgnoreCase("'C.C'"));
-                             System.out.println("list5 : " + list.get(5)); 
-                             System.out.println("list5 : " + !list.get(5).trim().equalsIgnoreCase("30"));
-                             System.out.println("list5 : " + !list.get(5).trim().equalsIgnoreCase("'30'"));
-                            if(!list.get(37).trim().equalsIgnoreCase("'c.c'") && !list.get(5).trim().equalsIgnoreCase("'30'")){
-                                System.out.println("#############################################################");
+                                
+                            if(!list.get(37).trim().equalsIgnoreCase("c.c") && !list.get(5).trim().equalsIgnoreCase("30")){
                                 duedate = getsameday().trim();
                                
                            if(duedate.trim().length()>=4){
@@ -564,19 +619,27 @@ for(File file : listOfFiles){
                                System.out.println("#############################################################"+duedate);
                                                                                                        
                                
-                               setdate(duedate,columIndex);
+                               setdate(duedate,columIndex); 
                             }
-                            else{      
+                            else{ 
+                               
+                               
+                               
+                               
+                               
+                               
                                      duedate  = getduedate();   // do calculation of due_date 
 
                                   if(duedate.trim().length()>2){
 //                                    System.out.println("Final Arrival Date is######################### "+duedate);
                                     setdate(duedate,columIndex);
                                     
+                                    
                                     }
 
                                     else{
                                         System.out.println("date is nullllllllllllllllllllllllllllllll");
+                                        cache[++basecount].add(String.valueOf(""));
                                         stmt.setNull(columIndex, java.sql.Types.DATE);
                                     }
 
@@ -616,6 +679,15 @@ for(File file : listOfFiles){
                            
                            System.out.println("Indix: "+i+" value: "+list.get(i));
                        }
+                       
+                       for (ArrayList<String> mylist: cache) {
+                          for (String bar : mylist) {
+                            System.out.println(bar);
+                          }
+                          
+                          System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+                        }
+
 //                          stmt.executeUpdate();
 //                        System.out.println("DONEEEEEEEEEEEE !!!!!!!!!!!!!!!!!!!!!!!!!! >> !!!!!");
                     System.out.println("ROW********************************************************************>>"+count);
@@ -683,9 +755,12 @@ for(File file : listOfFiles){
           DateFormat formatter = new SimpleDateFormat("HH:mm");
                              String str_time = null;
                              str_time=value.trim();
+                             
 //                             System.out.println("before formatting Date"+str_time);
                              
-                             element = "'"+str_time+":00"+"'";
+                             String temp = str_time+":00";
+                             element = "'"+temp+"'";
+                              cache[++basecount].add(String.valueOf(temp));
                              list.add(element);
 //                             System.out.println(str_time.trim());
                              date = formatter.parse(str_time.trim()); 
@@ -702,6 +777,7 @@ for(File file : listOfFiles){
         String  reformattedStr=null;
         reformattedStr = myFormat1.format((Date)toformat.parse(duedate.trim()));
                                     element = "'"+reformattedStr+"'";
+                                     cache[++basecount].add(String.valueOf(reformattedStr));
                                     list.add(reformattedStr);
                                      try {
                                         Date final_date = myFormat1.parse(reformattedStr);
@@ -729,12 +805,13 @@ for(File file : listOfFiles){
         
     ResultSet rs = null;
     Connection conn = null;
-    PreparedStatement stmt = null;    
+    PreparedStatement stmt = null; 
+    stmt.setMaxRows(2);  // for getting less output row only 2. 
         
      conn = databaseconnection(userid, password);
 
         
-            System.out.println("date "+list.get(9));
+       System.out.println("date "+list.get(9));
        System.out.println("store no "+list.get(0));
        System.out.println("open time "+list.get(33));
        System.out.println("close "+list.get(34));
@@ -769,6 +846,7 @@ for(File file : listOfFiles){
         System.out.println("data is "+rs.getString("del_date"));
         System.out.println("data is "+rs.getString("store_no"));
         date = rs.getString(1);
+        
         }
         else
             date = "no";
